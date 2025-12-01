@@ -16,9 +16,7 @@ def count_zeros(numb: int, _) -> int:
 
 
 def count_zero_crossings(numb: int, numb_old: int) -> int:
-    cnt = 0
-    if numb <= 0 and numb_old != 0:
-        cnt += 1
+    cnt = 1 if numb <= 0 and numb_old != 0 else 0
     cnt += abs(numb) // 100
     return cnt
 
