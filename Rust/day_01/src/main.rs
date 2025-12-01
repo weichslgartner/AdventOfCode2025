@@ -1,5 +1,3 @@
-use std::ops::{Add, Sub};
-
 type Rotation = (char, i32);
 
 fn parse_input(lines: &str) -> Vec<Rotation> {
@@ -28,26 +26,21 @@ fn count_zero_crossings(numb: i32, numb_old: i32) -> i32 {
 }
 
 fn solve(rotations: &[Rotation], condition: impl Fn(i32, i32) -> i32) -> i32 {
-    let mut cnt = 0;
-    let mut numb: i32 = 50;
-    let mut numb_old: i32 = numb;
-    for (r, n) in rotations {
-                match r {
-            'R' => {
-                numb = numb.add(n); 
-            }
-            'L' => {
-                numb = numb.sub(n);
-            }
-            _ => panic!("Invalid rotation direction: {}", r),
-        }
-        
-        cnt += condition(numb, numb_old);        
-        numb %= 100;
-        numb_old = numb;
-    }
-
-    cnt
+    rotations
+        .iter()
+        // state holds the current modded value (starts at 50)
+        .scan(50i32, |state, (r, n)| {
+            let prev_mod = *state;
+            let unmod = match r {
+                'R' => prev_mod + n,
+                'L' => prev_mod - n,
+                _ => panic!("Invalid rotation direction: {}", r),
+            };
+            let cnt = condition(unmod, prev_mod);
+            *state = unmod % 100;
+            Some(cnt)
+        })
+        .sum()
 }
 
 
