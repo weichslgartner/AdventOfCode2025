@@ -1,11 +1,7 @@
 from operator import add, sub
-from functools import reduce
-from itertools import accumulate
 from typing import List, Tuple, Callable
 
 from aoc import get_lines
-
-op_dict = {'R': add, 'L': sub}
 
 
 def parse_input(lines: List[str]) -> List[Tuple[str, int]]:
@@ -22,11 +18,12 @@ def count_zero_crossings(numb: int, numb_old: int) -> int:
 
 
 def solve(rotations: List[Tuple[str, int]], condition: Callable[[int, int], int]) -> int:
+    op_dict = {'R': add, 'L': sub}
     cnt = 0
     numb = 50
     for r, n in rotations:
         numb_old = numb
-        numb = reduce(op_dict[r], [numb, n])
+        numb = op_dict[r](numb, n)
         cnt += condition(numb, numb_old)
         numb %= 100
     return cnt
