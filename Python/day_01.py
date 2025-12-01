@@ -11,7 +11,7 @@ def parse_input(lines: List[str]) -> List[Tuple[str, int]]:
     return [(line[0], int(line[1:])) for line in lines]
 
 
-def count_zeros(numb: int, _) -> int:
+def is_zero(numb: int, _) -> int:
     return numb % 100 == 0
 
 
@@ -34,7 +34,7 @@ def solve(rotations: List[Tuple[str, int]], condition: Callable[[int, int], int]
 
 
 def part_1(rotations: List[Tuple[str, int]]) -> int:
-    return solve(rotations, count_zeros)
+    return solve(rotations, is_zero)
 
 
 def part_2(rotations: List[Tuple[str, int]]) -> int:
@@ -42,8 +42,7 @@ def part_2(rotations: List[Tuple[str, int]]) -> int:
 
 
 def main():
-    lines = get_lines("input_01.txt")
-    rotations = parse_input(lines)
+    rotations = parse_input(get_lines("input_01.txt"))
     print("Part 1:", part_1(rotations))
     print("Part 2:", part_2(rotations))
 
