@@ -36,9 +36,8 @@ fn solve(rotations: &[Rotation], condition: impl Fn(i32, i32) -> i32) -> i32 {
                 'L' => prev_mod - n,
                 _ => panic!("Invalid rotation direction: {}", r),
             };
-            let cnt = condition(unmod, prev_mod);
             *state = unmod % 100;
-            Some(cnt)
+            Some(condition(unmod, prev_mod))
         })
         .sum()
 }
