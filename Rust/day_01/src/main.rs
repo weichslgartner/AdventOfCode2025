@@ -60,8 +60,7 @@ fn part_2(rotations: &[Rotation]) -> i32 {
 }
 
 fn main() {
-    let contents = include_str!("../../../inputs/input_01.txt");
-    let rotations = parse_input(contents);
+    let rotations = parse_input(include_str!("../../../inputs/input_01.txt"));
     println!("Part 1: {}", part_1(&rotations));
     println!("Part 2: {}", part_2(&rotations));
 }
