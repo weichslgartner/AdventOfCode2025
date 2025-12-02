@@ -1,19 +1,27 @@
 from functools import reduce
-
+from typing import List, Set, Optional
 from aoc import input_as_str
 
+RangePair = List[str, str]
 
-def parse_input(in_str):
+
+def parse_input(in_str: str) -> List[RangePair]:
     return [token.split("-", maxsplit=1) for token in in_str.split(",")]
 
 
-def add_if_invalid(seen, i, lower, upper, repeats):
+def add_if_invalid(
+        seen: Set[str],
+        i: int,
+        lower: int,
+        upper: int,
+        repeats: int
+) -> Set[str]:
     if (candidate := str(i) * repeats) and lower <= int(candidate) <= upper:
         seen.add(candidate)
     return seen
 
 
-def get_invalid_sum(pair, repeats=2, seen=None):
+def get_invalid_sum(pair: RangePair, repeats: int = 2, seen: Optional[Set[str]] = None) -> int:
     seen = set() if not seen else seen
     lower, upper = map(int, pair)
     length_a, length_b = len(pair[0]) // repeats, len(pair[1]) // repeats
@@ -26,16 +34,16 @@ def get_invalid_sum(pair, repeats=2, seen=None):
     )))
 
 
-def cnt_all_invalid_sequences(pair):
+def cnt_all_invalid_sequences(pair: RangePair) -> int:
     seen = set()
     return sum(get_invalid_sum(pair, repeats=i, seen=seen) for i in range(2, len(pair[1]) + 1))
 
 
-def part_1(pairs):
+def part_1(pairs: List[RangePair]) -> int:
     return sum(map(get_invalid_sum, pairs))
 
 
-def part_2(pairs):
+def part_2(pairs: List[RangePair]) -> int:
     return sum(map(cnt_all_invalid_sequences, pairs))
 
 
