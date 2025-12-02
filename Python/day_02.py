@@ -1,12 +1,12 @@
 from functools import reduce
-from typing import List, Set, Optional
+from typing import List, Tuple, Set, Optional
 from aoc import input_as_str
 
-RangePair = List[str, str]
+RangePair = Tuple[str]
 
 
 def parse_input(in_str: str) -> List[RangePair]:
-    return [token.split("-", maxsplit=1) for token in in_str.split(",")]
+    return [tuple(token.split("-", maxsplit=1)) for token in in_str.split(",")]
 
 
 def add_if_invalid(
