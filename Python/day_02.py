@@ -12,27 +12,38 @@ def parse_input(in_str):
 def part_1(pairs):
     invalid_ids_sum = 0
     for pair in pairs:
-        lower = int(pair[0])
-        upper = int(pair[1])
-        p0 = pair[0][:len(pair[0]) // 2]
-        if len(p0) == 0:
-            p0 = "1"
-        p1 = pair[1][:len(pair[1]) // 2]
-        print("range",pair,p0,p1)
-
-        if int(p1) <  int(p0):
-            p1 += "0"
-        print(lower,upper)
-        for i in range(int(p0),int(p1)+1):
-            candidate = str(i) + str(i)
-            print(candidate)
-            if lower <= int(candidate) <= upper:
-                print(candidate, "invalid",invalid_ids_sum)
-                invalid_ids_sum += int(candidate)
+        invalid_ids_sum += get_invalids(set(), pair, repeats=2)
     return invalid_ids_sum
 
-def part_2(lines):
-    pass
+
+def get_invalids(seen,pair, repeats):
+    invalid_ids_sum = 0
+    lower = int(pair[0])
+    upper = int(pair[1])
+    p0 = pair[0][:len(pair[0]) // repeats]
+    if len(p0) == 0:
+        p0 = "1"
+    p1 = pair[1][:len(pair[1]) // repeats]
+    if int(p1) < int(p0):
+        p1 += "0"
+    #print(lower, upper)
+    for i in range(int(p0), int(p1) + 1):
+        candidate = str(i) * repeats
+       # print(candidate)
+        if lower <= int(candidate) <= upper and candidate not in seen:
+           # print(candidate, "invalid")
+            seen.add(candidate)
+            invalid_ids_sum += int(candidate)
+    return invalid_ids_sum
+
+
+def part_2(pairs):
+    invalid_ids_sum = 0
+    for pair in pairs:
+        seen = set()
+        for i in range(2,len(pair[1])+1):
+            invalid_ids_sum += get_invalids(seen, pair, repeats=i)
+    return invalid_ids_sum
 
 
 def main():
