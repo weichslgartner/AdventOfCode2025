@@ -6,22 +6,19 @@ def parse_input(in_str):
 
 
 def get_invalids(pair, repeats=2, seen=None):
-    invalid_ids_sum = 0
-    lower = int(pair[0])
-    upper = int(pair[1])
-    p0 = pair[0][:len(pair[0]) // repeats]
-    if len(p0) == 0:
-        p0 = "1"
-    p1 = pair[1][:len(pair[1]) // repeats]
-    if int(p1) < int(p0):
-        p1 += "0"
-    for i in range(int(p0), int(p1) + 1):
-        candidate = str(i) * repeats
-        if lower <= int(candidate) <= upper and (seen is None or candidate not in seen):
-            if seen:
-                seen.add(candidate)
-            invalid_ids_sum += int(candidate)
-    return invalid_ids_sum
+    seen = set() if not seen else seen
+    lower, upper = map(int, pair)
+    length_a, length_b = len(pair[0]) // repeats, len(pair[1]) // repeats
+    pattern_a = pair[0][:length_a] if length_a != 0 else "1"
+    pattern_b = pair[1][:length_b] + "0"*(length_a-length_b) # fill with 0 if upper pattern is too short
+    return sum(
+        int(candidate)
+        for i in range(int(pattern_a), int(pattern_b) + 1)
+        if (candidate := str(i) * repeats)
+        and lower <= int(candidate) <= upper
+        and candidate not in seen
+        and not seen.add(candidate)
+    )
 
 
 def cnt_all_invalid_sequences(pair):
