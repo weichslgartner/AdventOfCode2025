@@ -1,22 +1,15 @@
 from aoc import input_as_str
 
 
-def is_invalid(id_str: str) -> bool:
-    return id_str[:len(id_str) // 2] == id_str[len(id_str) // 2:]
-
-
 def parse_input(in_str):
     return [token.split("-", maxsplit=1) for token in in_str.split(",")]
 
 
 def part_1(pairs):
-    invalid_ids_sum = 0
-    for pair in pairs:
-        invalid_ids_sum += get_invalids(set(), pair, repeats=2)
-    return invalid_ids_sum
+    return sum(map(get_invalids, pairs))
 
 
-def get_invalids(seen,pair, repeats):
+def get_invalids(pair, repeats=2, seen=None):
     invalid_ids_sum = 0
     lower = int(pair[0])
     upper = int(pair[1])
@@ -26,23 +19,24 @@ def get_invalids(seen,pair, repeats):
     p1 = pair[1][:len(pair[1]) // repeats]
     if int(p1) < int(p0):
         p1 += "0"
-    #print(lower, upper)
     for i in range(int(p0), int(p1) + 1):
         candidate = str(i) * repeats
-       # print(candidate)
-        if lower <= int(candidate) <= upper and candidate not in seen:
-           # print(candidate, "invalid")
-            seen.add(candidate)
+        if lower <= int(candidate) <= upper and (seen is None or candidate not in seen):
+            if seen:
+                seen.add(candidate)
             invalid_ids_sum += int(candidate)
     return invalid_ids_sum
 
 
 def part_2(pairs):
+    return sum(map(cnt_all_invalid_sequences, pairs))
+
+
+def cnt_all_invalid_sequences(pair):
     invalid_ids_sum = 0
-    for pair in pairs:
-        seen = set()
-        for i in range(2,len(pair[1])+1):
-            invalid_ids_sum += get_invalids(seen, pair, repeats=i)
+    seen = set()
+    for i in range(2, len(pair[1]) + 1):
+        invalid_ids_sum += get_invalids(pair, repeats=i, seen=seen)
     return invalid_ids_sum
 
 
