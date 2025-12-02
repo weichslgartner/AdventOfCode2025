@@ -5,10 +5,6 @@ def parse_input(in_str):
     return [token.split("-", maxsplit=1) for token in in_str.split(",")]
 
 
-def part_1(pairs):
-    return sum(map(get_invalids, pairs))
-
-
 def get_invalids(pair, repeats=2, seen=None):
     invalid_ids_sum = 0
     lower = int(pair[0])
@@ -28,16 +24,17 @@ def get_invalids(pair, repeats=2, seen=None):
     return invalid_ids_sum
 
 
+def cnt_all_invalid_sequences(pair):
+    seen = set()
+    return sum(get_invalids(pair, repeats=i, seen=seen) for i in range(2, len(pair[1]) + 1))
+
+
+def part_1(pairs):
+    return sum(map(get_invalids, pairs))
+
+
 def part_2(pairs):
     return sum(map(cnt_all_invalid_sequences, pairs))
-
-
-def cnt_all_invalid_sequences(pair):
-    invalid_ids_sum = 0
-    seen = set()
-    for i in range(2, len(pair[1]) + 1):
-        invalid_ids_sum += get_invalids(pair, repeats=i, seen=seen)
-    return invalid_ids_sum
 
 
 def main():
