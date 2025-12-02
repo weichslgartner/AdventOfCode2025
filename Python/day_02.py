@@ -1,3 +1,5 @@
+from functools import reduce
+
 from aoc import input_as_str
 
 
@@ -5,29 +7,32 @@ def parse_input(in_str):
     return [token.split("-", maxsplit=1) for token in in_str.split(",")]
 
 
-def get_invalids(pair, repeats=2, seen=None):
+def add_if_invalid(seen, i, lower, upper, repeats):
+    if (candidate := str(i) * repeats) and lower <= int(candidate) <= upper:
+        seen.add(candidate)
+    return seen
+
+
+def get_invalid_sum(pair, repeats=2, seen=None):
     seen = set() if not seen else seen
     lower, upper = map(int, pair)
     length_a, length_b = len(pair[0]) // repeats, len(pair[1]) // repeats
     pattern_a = pair[0][:length_a] if length_a != 0 else "1"
-    pattern_b = pair[1][:length_b] + "0"*(length_a-length_b) # fill with 0 if upper pattern is too short
-    return sum(
-        int(candidate)
-        for i in range(int(pattern_a), int(pattern_b) + 1)
-        if (candidate := str(i) * repeats)
-        and lower <= int(candidate) <= upper
-        and candidate not in seen
-        and not seen.add(candidate)
-    )
+    pattern_b = pair[1][:length_b] + "0" * (length_a - length_b)  # fill with 0 if upper pattern is too short
+    return sum(map(int, reduce(
+        lambda acc, i: add_if_invalid(acc, i, lower, upper, repeats),
+        range(int(pattern_a), int(pattern_b) + 1),
+        seen
+    )))
 
 
 def cnt_all_invalid_sequences(pair):
     seen = set()
-    return sum(get_invalids(pair, repeats=i, seen=seen) for i in range(2, len(pair[1]) + 1))
+    return sum(get_invalid_sum(pair, repeats=i, seen=seen) for i in range(2, len(pair[1]) + 1))
 
 
 def part_1(pairs):
-    return sum(map(get_invalids, pairs))
+    return sum(map(get_invalid_sum, pairs))
 
 
 def part_2(pairs):
