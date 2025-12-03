@@ -30,14 +30,12 @@ fn find_max_jolt_recursive(
     }
     for key in batteries.0.keys().rev() {
         if let Some(val) = batteries.0.get(key) {
-            for &v in val {
-                if v > last_idx {
-                    let new_acc = (acc + current_number) * 10u64;
-                    if let Some(res) =
-                        find_max_jolt_recursive(batteries, *key as u64, v, length - 1, new_acc)
-                    {
-                        return Some(res);
-                    }
+            let i = val.partition_point(|&v| v <= last_idx);
+            if i < val.len() {
+                if let Some(res) =
+                    find_max_jolt_recursive(batteries, *key as u64, val[i], length - 1,  (acc + current_number) * 10u64)
+                {
+                    return Some(res);
                 }
             }
         }
