@@ -1,3 +1,4 @@
+from bisect import bisect_right
 from collections import defaultdict
 from typing import List, Dict, Optional, Tuple
 
@@ -16,19 +17,19 @@ def parse_input(lines: List[str]) -> List[JoltDict]:
     return battery_list
 
 
-def find_max_jolt_recursive(batteries_w_len: JoltDict, current_number: int, last_idx: int, length: int,
+def find_max_jolt_recursive(batteries_w_l: JoltDict, current_number: int, last_idx: int, length: int,
                             acc: int) -> Optional[int]:
-    batteries, max_len = batteries_w_len
+    batteries, max_len = batteries_w_l
     if length == 0:
         return acc + current_number
     # additional pruning
     if length > max_len - last_idx:
         return None
     for key, val in batteries.items():
-        for v in val:
-            if v > last_idx:
-                if res := find_max_jolt_recursive(batteries_w_len, key, v, length - 1, (acc + current_number) * 10):
-                    return res
+        i = bisect_right(val, last_idx)
+        if (i < len(val) and
+                (res := find_max_jolt_recursive(batteries_w_l, key, val[i], length - 1, (acc + current_number) * 10))):
+            return res
     return None
 
 
