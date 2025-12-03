@@ -1,5 +1,5 @@
 use std::collections::BTreeMap;
-type JoltDict = (BTreeMap<u8 , Vec<u32>>, usize);
+type JoltDict = (BTreeMap<u8, Vec<u32>>, usize);
 
 fn parse_input(input: &str) -> Vec<JoltDict> {
     let mut battery_list: Vec<JoltDict> = Vec::new();
@@ -18,28 +18,26 @@ fn parse_input(input: &str) -> Vec<JoltDict> {
 fn find_max_jolt_recursive(
     batteries: &JoltDict,
     current_number: u64,
-    used: &mut Vec<u32>,
+    last_idx: u32,
     length: u32,
     acc: u64,
 ) -> Option<u64> {
     if length == 0 {
         return Some(acc + current_number);
     }
-    if length as usize > batteries.1 - used.len(){
+    if length > batteries.1 as u32 - last_idx {
         return None;
     }
     for key in batteries.0.keys().rev() {
         if let Some(val) = batteries.0.get(key) {
             for &v in val {
-                if v > *used.last().unwrap() {
-                    used.push(v);
+                if v > last_idx {
                     let new_acc = (acc + current_number) * 10u64;
                     if let Some(res) =
-                        find_max_jolt_recursive(batteries, *key as u64, used, length - 1, new_acc)
+                        find_max_jolt_recursive(batteries, *key as u64, v, length - 1, new_acc)
                     {
                         return Some(res);
                     }
-                    used.pop();
                 }
             }
         }
@@ -50,10 +48,13 @@ fn find_max_jolt_recursive(
 fn find_max_jolt(batteries: &JoltDict, length: u32) -> u64 {
     for k in batteries.0.keys().rev() {
         if let Some(v) = batteries.0.get(k) {
-            let mut used = vec![v.first().cloned().unwrap()];
-            if let Some(res) =
-                find_max_jolt_recursive(batteries, *k as u64, &mut used, length - 1, 0u64)
-            {
+            if let Some(res) = find_max_jolt_recursive(
+                batteries,
+                *k as u64,
+                v.first().cloned().unwrap(),
+                length - 1,
+                0u64,
+            ) {
                 return res;
             }
         }

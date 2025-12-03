@@ -16,27 +16,25 @@ def parse_input(lines: List[str]) -> List[JoltDict]:
     return battery_list
 
 
-def find_max_jolt_recursive(batteries_w_len: JoltDict, current_number: int, used: List[int], length: int,
+def find_max_jolt_recursive(batteries_w_len: JoltDict, current_number: int, last_idx: int, length: int,
                             acc: int) -> Optional[int]:
     batteries, max_len = batteries_w_len
     if length == 0:
         return acc + current_number
     # additional pruning
-    if length > max_len - used[-1]:
+    if length > max_len - last_idx:
         return None
     for key, val in batteries.items():
         for v in val:
-            if v > used[-1]:
-                used.append(v)
-                if res := find_max_jolt_recursive(batteries_w_len, key, used, length - 1, (acc + current_number) * 10):
+            if v > last_idx:
+                if res := find_max_jolt_recursive(batteries_w_len, key, v, length - 1, (acc + current_number) * 10):
                     return res
-                used.pop()
     return None
 
 
 def find_max_jolt(batteries: JoltDict, length: int = 2) -> int:
     for k, v in batteries[0].items():
-        if res := find_max_jolt_recursive(batteries, k, [v[0]], length - 1, 0):
+        if res := find_max_jolt_recursive(batteries, k, v[0], length - 1, 0):
             return res
 
 
