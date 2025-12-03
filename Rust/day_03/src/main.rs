@@ -8,7 +8,6 @@ fn parse_input(input: &str) -> Vec<JoltDict> {
         for (i, c) in line.chars().enumerate() {
             if let Some(jolt) = c.to_digit(10) {
                 batteries.entry(jolt as u8).or_default().push(i as u32);
-                batteries.get_mut(&(jolt as u8)).unwrap().sort_unstable();
             }
         }
         battery_list.push(batteries);
