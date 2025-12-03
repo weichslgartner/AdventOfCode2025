@@ -1,5 +1,5 @@
 use std::collections::BTreeMap;
-type JoltDict = BTreeMap<i8, Vec<u32>>;
+type JoltDict = BTreeMap<u8 , Vec<u32>>;
 
 fn parse_input(input: &str) -> Vec<JoltDict> {
     let mut battery_list: Vec<JoltDict> = Vec::new();
@@ -7,8 +7,8 @@ fn parse_input(input: &str) -> Vec<JoltDict> {
         let mut batteries: JoltDict = BTreeMap::new();
         for (i, c) in line.chars().enumerate() {
             if let Some(jolt) = c.to_digit(10) {
-                batteries.entry(jolt as i8).or_default().push(i as u32);
-                batteries.get_mut(&(jolt as i8)).unwrap().sort_unstable();
+                batteries.entry(jolt as u8).or_default().push(i as u32);
+                batteries.get_mut(&(jolt as u8)).unwrap().sort_unstable();
             }
         }
         battery_list.push(batteries);

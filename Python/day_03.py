@@ -30,9 +30,9 @@ def find_max_jolt_recursive(batteries: JoltDict, current_number: int, used: List
     return None
 
 
-def find_max_jolt(batteries: JoltDict, length: int = 1) -> int:
+def find_max_jolt(batteries: JoltDict, length: int = 2) -> int:
     for k, v in batteries.items():
-        if res := find_max_jolt_recursive(batteries, k, [v[0]], length, 0):
+        if res := find_max_jolt_recursive(batteries, k, [v[0]], length - 1, 0):
             return res
 
 
@@ -41,7 +41,7 @@ def part_1(batteries: List[JoltDict]) -> int:
 
 
 def part_2(batteries: List[JoltDict]) -> int:
-    return sum(find_max_jolt(b, 11) for b in batteries)
+    return sum(find_max_jolt(b, 12) for b in batteries)
 
 
 def main():
