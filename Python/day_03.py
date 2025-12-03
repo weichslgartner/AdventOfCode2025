@@ -1,9 +1,9 @@
 from collections import defaultdict
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Tuple
 
 from aoc import get_lines
 
-JoltDict = Dict[int, List[int]]
+JoltDict = Tuple[Dict[int, List[int]], int]
 
 
 def parse_input(lines: List[str]) -> List[JoltDict]:
@@ -12,32 +12,36 @@ def parse_input(lines: List[str]) -> List[JoltDict]:
         batteries = defaultdict(list)
         for i, c in enumerate(line):
             batteries[int(c)].append(i)
-        battery_list.append(dict(sorted(batteries.items(), reverse=True)))
+        battery_list.append((dict(sorted(batteries.items(), reverse=True)), len(line)))
     return battery_list
 
 
-def find_max_jolt_recursive(batteries: JoltDict, current_number: int, used: List[int], length: int, acc: int) \
-        -> Optional[int]:
+def find_max_jolt_recursive(batteries_w_len: JoltDict, current_number: int, used: List[int], length: int,
+                            acc: int) -> Optional[int]:
+    batteries, max_len = batteries_w_len
     if length == 0:
         return acc + current_number
+    # additional pruning
+    if length > max_len - used[-1]:
+        return None
     for key, val in batteries.items():
         for v in val:
             if v > used[-1]:
                 used.append(v)
-                if res := find_max_jolt_recursive(batteries, key, used, length - 1, (acc + current_number) * 10):
+                if res := find_max_jolt_recursive(batteries_w_len, key, used, length - 1, (acc + current_number) * 10):
                     return res
                 used.pop()
     return None
 
 
 def find_max_jolt(batteries: JoltDict, length: int = 2) -> int:
-    for k, v in batteries.items():
+    for k, v in batteries[0].items():
         if res := find_max_jolt_recursive(batteries, k, [v[0]], length - 1, 0):
             return res
 
 
 def part_1(batteries: List[JoltDict]) -> int:
-    return sum(map(find_max_jolt, batteries))
+    return sum(find_max_jolt(b, 2) for b in batteries)
 
 
 def part_2(batteries: List[JoltDict]) -> int:
