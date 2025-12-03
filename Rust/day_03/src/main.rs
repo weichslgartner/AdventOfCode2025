@@ -25,7 +25,7 @@ fn find_max_jolt_recursive(
     if length == 0 {
         return Some(acc + current_number);
     }
-    if length > batteries.1 as u32 - used.len() as u32 {
+    if length as usize > batteries.1 - used.len(){
         return None;
     }
     for key in batteries.0.keys().rev() {
