@@ -1,16 +1,16 @@
 use std::collections::BTreeMap;
-type JoltDict = BTreeMap<u8 , Vec<u32>>;
+type JoltDict = (BTreeMap<u8 , Vec<u32>>, usize);
 
 fn parse_input(input: &str) -> Vec<JoltDict> {
     let mut battery_list: Vec<JoltDict> = Vec::new();
     for line in input.lines() {
-        let mut batteries: JoltDict = BTreeMap::new();
+        let mut batteries: BTreeMap<u8, Vec<u32>> = BTreeMap::new();
         for (i, c) in line.chars().enumerate() {
             if let Some(jolt) = c.to_digit(10) {
                 batteries.entry(jolt as u8).or_default().push(i as u32);
             }
         }
-        battery_list.push(batteries);
+        battery_list.push((batteries, line.len()));
     }
     battery_list
 }
@@ -25,8 +25,11 @@ fn find_max_jolt_recursive(
     if length == 0 {
         return Some(acc + current_number);
     }
-    for key in batteries.keys().rev() {
-        if let Some(val) = batteries.get(key) {
+    if length > batteries.1 as u32 - used.len() as u32 {
+        return None;
+    }
+    for key in batteries.0.keys().rev() {
+        if let Some(val) = batteries.0.get(key) {
             for &v in val {
                 if v > *used.last().unwrap() {
                     used.push(v);
@@ -45,8 +48,8 @@ fn find_max_jolt_recursive(
 }
 
 fn find_max_jolt(batteries: &JoltDict, length: u32) -> u64 {
-    for k in batteries.keys().rev() {
-        if let Some(v) = batteries.get(k) {
+    for k in batteries.0.keys().rev() {
+        if let Some(v) = batteries.0.get(k) {
             let mut used = vec![v.first().cloned().unwrap()];
             if let Some(res) =
                 find_max_jolt_recursive(batteries, *k as u64, &mut used, length - 1, 0u64)
