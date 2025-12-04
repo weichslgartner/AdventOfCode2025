@@ -3,7 +3,7 @@ from collections import namedtuple
 from enum import Enum, StrEnum
 from itertools import filterfalse, tee, islice
 from pathlib import Path
-from typing import List, Callable, Iterable, Iterator, Any
+from typing import List, Callable, Iterable, Iterator, Any, Set
 
 
 class Point(namedtuple('Point', 'x y')):
@@ -96,8 +96,8 @@ def get_neighbours_8(p: Point, p_max: Point) -> Iterator[Point]:
     return filter(lambda n: is_in_grid(n, p_max), points)
 
 
-def get_neighbours_8_no_filter(p: Point) -> List[Point]:
-    return [Point(p.x + x, p.y + y) for y in range(-1, 2) for x in range(-1, 2) if x != 0 or y != 0]
+def get_neighbours_8_no_filter(p: Point) -> Set[Point]:
+    return set(Point(p.x + x, p.y + y) for y in range(-1, 2) for x in range(-1, 2) if x != 0 or y != 0)
 
 
 def is_in_grid(p: Point, p_max: Point) -> bool:
