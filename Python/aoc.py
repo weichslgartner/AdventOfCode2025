@@ -96,6 +96,10 @@ def get_neighbours_8(p: Point, p_max: Point) -> Iterator[Point]:
     return filter(lambda n: is_in_grid(n, p_max), points)
 
 
+def get_neighbours_8_no_filter(p: Point) -> List[Point]:
+    return [Point(p.x + x, p.y + y) for y in range(-1, 2) for x in range(-1, 2) if x != 0 or y != 0]
+
+
 def is_in_grid(p: Point, p_max: Point) -> bool:
     return (p.x >= 0) and (p.y >= 0) and (p.x < p_max.x) and (p.y < p_max.y)
 
