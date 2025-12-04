@@ -100,6 +100,13 @@ def get_neighbours_8_no_filter(p: Point) -> Set[Point]:
     return set(Point(p.x + x, p.y + y) for y in range(-1, 2) for x in range(-1, 2) if x != 0 or y != 0)
 
 
+def parse_grid(lines: List[str], symbol='@') -> Set[Point]:
+    return {Point(x=x, y=y)
+            for y, line in enumerate(lines)
+            for x, c in enumerate(line)
+            if c == symbol}
+
+
 def is_in_grid(p: Point, p_max: Point) -> bool:
     return (p.x >= 0) and (p.y >= 0) and (p.x < p_max.x) and (p.y < p_max.y)
 
