@@ -2,26 +2,18 @@ from aoc import input_as_str
 from typing import List, Tuple
 
 
-def parse_input(lines: str) -> Tuple[List[Tuple[int, int]], List[int]]:
+def parse_input(lines: str) -> Tuple[List[Tuple[int, ...]], List[int]]:
     ranges, ids = lines.split("\n\n", maxsplit=1)
-    ranges = [tuple(map(int, r.split("-", maxsplit=1))) for r in ranges.splitlines()]
-    return ranges, [int(i) for i in ids.splitlines()]
+    return (sorted([tuple(map(int, r.split("-", maxsplit=1))) for r in ranges.splitlines()]),
+            [int(i) for i in ids.splitlines()])
 
 
-def part_1(ranges: List[Tuple[int, int]], ids: List[int]) -> int:
-    fresh_ids = 0
-    for i in ids:
-        for r in ranges:
-            if r[0] <= i <= r[1]:
-                fresh_ids += 1
-                break
-    return fresh_ids
+def part_1(ranges: List[Tuple[int, ...]], ids: List[int]) -> int:
+    return sum(any(r[0] <= i <= r[1] for r in ranges) for i in ids)
 
 
-def part_2(ranges: List[Tuple[int, int]]) -> int:
-    if len(ranges) < 2:
-        return ranges
-    ranges.sort()
+def part_2(ranges: List[Tuple[int, ...]]) -> int:
+    # we assume ranges are sorted and len(ranges) > 1
     merged_ranges = []
     cur = ranges[0]
     for r in ranges[1:]:
