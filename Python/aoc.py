@@ -3,7 +3,7 @@ from collections import namedtuple
 from enum import Enum, StrEnum
 from itertools import filterfalse, tee, islice
 from pathlib import Path
-from typing import List, Callable, Iterable, Iterator, Any, Set
+from typing import List, Callable, Iterable, Iterator, Any, Set, Tuple
 
 
 class Point(namedtuple('Point', 'x y')):
@@ -159,3 +159,8 @@ def line_to_int(line: str, split_char=",") -> List[int]:
 
 def extract_all_ints(line: str) -> List[int]:
     return list(map(int, (re.findall(r'-?\d+', line))))
+
+
+def do_overlap_1d(range1: Tuple[int, int], range2: Tuple[int, int]) -> bool:
+    return range1[0] <= range2[1] and range2[0] <= range1[1]
+
