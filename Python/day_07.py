@@ -26,7 +26,7 @@ def part_1(start: Point, splitters: Dict[int, Set[int]]) -> int:
         splits = cur.intersection(s)
         total_splits += len(splits)
         cur -= splits
-        cur.update({x + 1 for x in splits} | {x - 1 for x in splits} )
+        cur.update({x + 1 for x in splits} | {x - 1 for x in splits})
     return total_splits
 
 
