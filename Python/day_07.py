@@ -14,7 +14,7 @@ def part_1(start: Point, splitters: Dict[int, Set[int]]) -> int:
     cur = {start.x}
     total_splits = 0
     for s in splitters.values():
-        splits = cur.intersection(s)
+        splits = cur & s
         cur = (cur - splits) | {n for x in splits for n in (x + 1, x - 1)}
         total_splits += len(splits)
     return total_splits
