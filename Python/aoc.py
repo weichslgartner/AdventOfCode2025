@@ -1,13 +1,15 @@
 import re
-from collections import namedtuple
 from enum import Enum, StrEnum
 from itertools import filterfalse, tee, islice
 from pathlib import Path
-from typing import List, Callable, Iterable, Iterator, Any, Set, Tuple
+from typing import List, Callable, Iterable, Iterator, Any, Set, Tuple, NamedTuple
 
 
-class Point(namedtuple('Point', 'x y')):
-    def __repr__(self):
+class Point(NamedTuple):
+    x: int
+    y: int
+
+    def __repr__(self) -> str:
         return f'{self.x} {self.y}'
 
 
@@ -71,8 +73,12 @@ def point_to_dir(p: Point) -> Direction:
     print(f"alarm {p}")
 
 
-class Point3(namedtuple('Point', 'x y z')):
-    def __repr__(self):
+class Point3(NamedTuple):
+    x: int
+    y: int
+    z: int
+
+    def __repr__(self) -> str:
         return f'{self.x},{self.y},{self.z}'
 
 
