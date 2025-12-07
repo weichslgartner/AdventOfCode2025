@@ -26,11 +26,7 @@ def part_1(start: Point, splitters: Dict[int, Set[int]]) -> int:
         splits = cur.intersection(s)
         total_splits += len(splits)
         cur -= splits
-        for x in splits:
-            if (left := x + 1) not in s:
-                cur.add(left)
-            if (right := x - 1) not in s:
-                cur.add(right)
+        cur.update({x + 1 for x in splits} | {x - 1 for x in splits} )
     return total_splits
 
 
@@ -40,12 +36,7 @@ def part_2(start: Point, y_max: int, splitters: Dict[int, Set[int]]) -> int:
         if p.y >= y_max:
             return 1
         if p.x in splitters.get(p.y, set()):
-            res = 0
-            if (p.x - 1) not in splitters[p.y]:
-                res += dfs(Point(x=p.x - 1, y=p.y + 1))
-            if (p.x + 1) not in splitters[p.y]:
-                res += dfs(Point(x=p.x + 1, y=p.y + 1))
-            return res
+            return dfs(Point(x=p.x - 1, y=p.y + 1)) + dfs(Point(x=p.x + 1, y=p.y + 1))
         return dfs(Point(p.x, p.y + 1))
     return dfs(start)
 
