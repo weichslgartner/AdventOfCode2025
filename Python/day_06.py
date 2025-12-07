@@ -10,7 +10,7 @@ OperatorFunc = Callable[[int, int], int]
 def parse_input(lines: List[str]) -> Tuple[List[List[int]], List[List[int]], List[OperatorFunc]]:
     ops = {"*": imul, "+": add}
     split_lines = [line.split() for line in lines[:-1]]
-    numbers_part1 = [[int(cols[i]) for cols in split_lines]for i in range(len(split_lines[0]))]
+    numbers_part1 = [[int(cols[i]) for cols in split_lines] for i in range(len(split_lines[0]))]
     numbers_part2 = []
     cur_list = []
     for idx in range(len(lines[0]) - 1, -1, -1):
