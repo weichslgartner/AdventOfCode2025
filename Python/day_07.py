@@ -1,4 +1,3 @@
-from collections import defaultdict
 from functools import cache
 from typing import List, Dict, Set, Tuple
 
@@ -6,17 +5,9 @@ from aoc import get_lines, Point
 
 
 def parse_input(lines: List[str]) -> Tuple[Point, int, Dict[int, Set[int]]]:
-    start = None
-    splitters: Dict[int, Set[int]] = defaultdict(set)
-    y_max = 0
-    for y, line in enumerate(lines):
-        for x, c in enumerate(line):
-            if c == "S":
-                start = Point(x, y)
-            elif c == "^":
-                splitters[y].add(x)
-        y_max = max(y, y_max)
-    return start, y_max, splitters
+    return (Point(x=lines[0].find('S'), y=0), len(lines),
+            {y: {x for x, c in enumerate(line) if c == "^"}
+             for y, line in enumerate(lines) if any(c == "^" for c in line)})
 
 
 def part_1(start: Point, splitters: Dict[int, Set[int]]) -> int:
@@ -24,9 +15,8 @@ def part_1(start: Point, splitters: Dict[int, Set[int]]) -> int:
     total_splits = 0
     for s in splitters.values():
         splits = cur.intersection(s)
+        cur = (cur - splits) | {n for x in splits for n in (x + 1, x - 1)}
         total_splits += len(splits)
-        cur -= splits
-        cur.update({x + 1 for x in splits} | {x - 1 for x in splits})
     return total_splits
 
 
