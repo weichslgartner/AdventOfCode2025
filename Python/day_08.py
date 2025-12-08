@@ -6,8 +6,7 @@ from itertools import combinations
 
 
 def parse_input(lines):
-    points = [line_to_int(line) for line in lines]
-    return [Point3(x=p[0], y=p[1], z=p[2]) for p in points]
+    return [Point3(x=p[0], y=p[1], z=p[2]) for p in [line_to_int(line) for line in lines]]
 
 def merge_clusters(p1, p2, cluster_map, clusters):
     to_delete = cluster_map[p2]
