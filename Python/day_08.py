@@ -48,7 +48,7 @@ def solve(points: List, l_pairs: int = 1000) -> Tuple[int, int]:
         if i == l_pairs - 1:
             three_biggest = reduce(operator.imul, heapq.nlargest(3, [len(c) for c in clusters.values()]))
         # part 2
-        if len(clusters) == 1 and len(clusters[cluster_map[p1]]) == len(points):
+        if len(clusters[cluster_map[p1]]) == len(points):
             return three_biggest, p1.x * p2.x
     return 0, 0
 
