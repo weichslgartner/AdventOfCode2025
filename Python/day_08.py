@@ -1,13 +1,17 @@
 from functools import reduce
-import heapq
-import operator
+from heapq import heapify, heappop, nlargest
+from operator import imul
 from typing import List, Tuple
-from aoc import Point3, get_lines, line_to_int, euclidean_distance_3d
 from itertools import combinations
+
+from aoc import Point3, get_lines, line_to_int, squared_distance_3d
 
 
 def parse_input(lines):
-    return [Point3(x=p[0], y=p[1], z=p[2]) for p in [line_to_int(line) for line in lines]]
+    return [
+        Point3(x=p[0], y=p[1], z=p[2]) for p in [line_to_int(line) for line in lines]
+    ]
+
 
 def merge_clusters(p1, p2, cluster_map, clusters):
     to_delete = cluster_map[p2]
@@ -15,6 +19,7 @@ def merge_clusters(p1, p2, cluster_map, clusters):
     for p in clusters[cluster_map[p2]]:
         cluster_map[p] = cluster_map[p1]
     del clusters[to_delete]
+
 
 def connect_points_pair(p1, p2, cluster_map, clusters, cur_id):
     if p1 in cluster_map and p2 in cluster_map:
@@ -40,16 +45,24 @@ def solve(points: List, l_pairs: int = 1000) -> Tuple[int, int]:
     clusters = {}
     cur_id = 0
     three_biggest = 0
-    dist_list = sorted([(euclidean_distance_3d(p1, p2), p1, p2) for p1, p2 in combinations(points, 2)],key=lambda x: x[0])
-    for i, el in enumerate(dist_list):
-        _, p1, p2 = el
+    dist_list = [
+        (squared_distance_3d(p1, p2), i, p1, p2) 
+        for i, (p1, p2) in enumerate(combinations(points, 2))
+    ]
+    heapify(dist_list)
+    i = 1
+    while dist_list:
+        _, _, p1, p2 = heappop(dist_list)
         cur_id = connect_points_pair(p1, p2, cluster_map, clusters, cur_id)
         # part1
-        if i == l_pairs - 1:
-            three_biggest = reduce(operator.imul, heapq.nlargest(3, [len(c) for c in clusters.values()]))
+        if i == l_pairs:
+            three_biggest = reduce(
+                imul, nlargest(3, [len(c) for c in clusters.values()])
+            )
         # part 2
         if len(clusters[cluster_map[p1]]) == len(points):
             return three_biggest, p1.x * p2.x
+        i+=1
     return 0, 0
 
 
@@ -63,3 +76,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+   

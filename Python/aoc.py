@@ -126,8 +126,8 @@ def manhattan_distance(a: Point, b: Point) -> int:
     return abs(a.x - b.x) + abs(a.y - b.y)
 
 
-def euclidean_distance_3d(a: Point3, b: Point3):
-    return math.sqrt((a.x-b.x)**2+(a.y-b.y)**2 +(a.z-b.z)**2)
+def squared_distance_3d(a: Point3, b: Point3):
+    return (a.x-b.x)**2+(a.y-b.y)**2 +(a.z-b.z)**2
 
 def get_lines(file_name: str) -> List[str]:
     file = Path(__file__).parents[1] / "inputs" / file_name
