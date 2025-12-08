@@ -9,16 +9,17 @@ def parse_input(lines):
     points = [line_to_int(line) for line in lines]
     return [Point3(x=p[0], y=p[1], z=p[2]) for p in points]
 
+def merge_clusters(p1, p2, cluster_map, clusters):
+    to_delete = cluster_map[p2]
+    clusters[cluster_map[p1]].update(clusters[cluster_map[p2]])
+    for p in clusters[cluster_map[p2]]:
+        cluster_map[p] = cluster_map[p1]
+    del clusters[to_delete]
 
 def connect_points_pair(p1, p2, cluster_map, clusters, cur_id):
     if p1 in cluster_map and p2 in cluster_map:
         if cluster_map[p1] != cluster_map[p2]:
-            # print("shit")
-            to_delete = cluster_map[p2]
-            clusters[cluster_map[p1]].update(clusters[cluster_map[p2]])
-            for p in clusters[cluster_map[p2]]:
-                cluster_map[p] = cluster_map[p1]
-            del clusters[to_delete]
+            merge_clusters(p1, p2, cluster_map, clusters)
         return cur_id
     elif p1 in cluster_map:
         next_id = cluster_map[p1]
