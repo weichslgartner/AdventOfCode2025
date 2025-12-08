@@ -1,4 +1,5 @@
 from functools import reduce
+import heapq
 import operator
 from typing import List, Tuple
 from aoc import Point3, get_lines, line_to_int, euclidean_distance_3d
@@ -45,9 +46,7 @@ def solve(points: List, l_pairs: int = 1000) -> Tuple[int, int]:
         cur_id = connect_points_pair(p1, p2, cluster_map, clusters, cur_id)
         # part1
         if i == l_pairs - 1:
-            sizes = [len(c) for c in clusters.values()]
-            sizes.sort(reverse=True)
-            three_biggest = reduce(operator.imul, sizes[:3])
+            three_biggest = reduce(operator.imul, heapq.nlargest(3, [len(c) for c in clusters.values()]))
         # part 2
         if len(clusters) == 1 and len(clusters[cluster_map[p1]]) == len(points):
             return three_biggest, p1.x * p2.x
