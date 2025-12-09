@@ -7,11 +7,7 @@ def parse_input(lines):
 
 
 def part_1(points):
-    max_area = 0
-    for p1, p2 in combinations(points, 2):
-        area = (abs(p1.x - p2.x) + 1) * (abs(p1.y - p2.y) + 1)
-        max_area = max(max_area, area)
-    return max_area
+    return max((abs(p1.x - p2.x) + 1) * (abs(p1.y - p2.y) + 1) for p1, p2 in combinations(points, 2))
 
 
 def part_2(points):
@@ -23,7 +19,6 @@ def part_2(points):
             inner_points.append(max([p1, p2], key=lambda p: p.x))
     lines.append((points[-1], points[0]))
     max_area = 0
-    best = None
     # upper half
     p1 = max(inner_points, key=lambda p: p.y)
     for p2 in points:
@@ -39,13 +34,10 @@ def part_2(points):
             ) and line[0].y >= p1.y:
                 lines_to_check.append(line)
         if all(to_check.y <= min(line[0].y, line[1].y) for line in lines_to_check):
-            area = (abs(p1.x - p2.x) + 1) * (abs(p1.y - p2.y) + 1)
-            if area > max_area:
-                max_area = area
-                best = [p1, Point(p1.x, p2.y), p2, Point(p2.x, p1.y), p1]
+            max_area = calculate_max_area(p1, p2, max_area)
+    # lower half
     p1 = min(inner_points, key=lambda p: p.y)
     lines_to_check = []
-
     for p2 in points:
         if p1 == p2 or p2.y > p1.y:
             continue
@@ -58,19 +50,24 @@ def part_2(points):
             ) and line[0].y <= p1.y:
                 lines_to_check.append(line)
         if all(to_check.y >= max(line[0].y, line[1].y) for line in lines_to_check):
-            area = (abs(p1.x - p2.x) + 1) * (abs(p1.y - p2.y) + 1)
-            if area > max_area:
-                max_area = area
-                best = [p1, Point(p1.x, p2.y), p2, Point(p2.x, p1.y), p1]
-    import matplotlib.pyplot as plt
-    print(inner_points)
-    points.append(points[0])  # to create a closed loop
-    xs, ys = zip(*points)  # create lists of x and y values
+            max_area = calculate_max_area(p1, p2, max_area)
+    # import matplotlib.pyplot as plt
+    # print(inner_points)
+    # points.append(points[0])  # to create a closed loop
+    # xs, ys = zip(*points)  # create lists of x and y values
     # plt.figure()
     # plt.plot(xs,ys)
     # if best:
     #     plt.plot(*zip(*best))
     # plt.show()
+    return max_area
+
+
+def calculate_max_area(p1, p2, max_area):
+    area = (abs(p1.x - p2.x) + 1) * (abs(p1.y - p2.y) + 1)
+    if area > max_area:
+        max_area = area
+        # best = [p1, Point(p1.x, p2.y), p2, Point(p2.x, p1.y), p1]
     return max_area
 
 
