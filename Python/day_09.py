@@ -24,6 +24,7 @@ def part_2(points):
     #plt.figure()
     #plt.plot(xs,ys) 
     #plt.show()
+    # these two points are inside the circle
     #94651,50319
     #94651,48450
     max_area = 0
