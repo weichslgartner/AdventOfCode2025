@@ -1,12 +1,15 @@
-import sys
+from typing import List, Tuple
 from aoc import get_lines
-from functools import cache
 from z3 import Int, Optimize, sat
-# yolo
-sys.setrecursionlimit(100000)
+from collections import deque
+
+# Type aliases
+Wiring = List[int]
+WiringSet = List[Wiring]
+WiringSets = List[WiringSet]
 
 
-def parse_input(lines):
+def parse_input(lines: List[str]) -> Tuple[List[Tuple[bool, ...]], WiringSets, List[List[int]]]:
     lights_diagram = []
     wirings = []
     joltage_reqs = []
@@ -23,87 +26,60 @@ def parse_input(lines):
     return lights_diagram, wirings, joltage_reqs
 
 
-def is_same(w1, w2):
-    for x, y in zip(w1, w2):
-        if x != y:
-            return False
-    return True
-
-
-def need_change(state, target):
-    change = []
-    for i, el in enumerate(zip(state, target)):
-        change.append(i)
-    return change
-
-
-def update_state(state, wiring):
-    return tuple(not s if i in wiring else s for i, s in enumerate(state))
-
-
-def update_state_partb(state, wiring):
-    state = list(state)
-    for w in wiring:
-        state[w] += 1
-    return tuple(state)
-
-
-def part_1(lights_diagram, wirings):
-    # print(lights_diagram,wirings)
+def part_1(lights_diagram: List[Tuple[bool, ...]], wirings: WiringSets) -> int:
     overall = 0
-
     for lights, wiring in zip(lights_diagram, wirings):
-        best = sys.maxsize
-        state_to_presses = dict()
-        def dfs(state, target, b_presses):
-            if is_same(state, target):
-                nonlocal best
-                best = min(best, b_presses)
-                return
-            if b_presses >= best:
-                return
-            if state in state_to_presses and state_to_presses[state] <= b_presses:
-                return
-            state_to_presses[state] = b_presses
-            for w in wiring:
-                new_state = update_state(state, w)
-                dfs(new_state, target, b_presses + 1)
-            return
-        dfs(tuple(False for _ in lights), lights, 0)
-        overall += best
+        wiring_masks = [sum(1 << i for i in w) for w in wiring]
+        target_state = sum(1 << i for i, light in enumerate(lights) if light)
+        queue = deque([(0, 0)])
+        visited = {0: 0}
+        while queue:
+            state, presses = queue.popleft()
+            if state == target_state:
+                overall += presses
+                break
+            for mask in wiring_masks:
+                new_state = state ^ mask
+                if new_state not in visited or visited[new_state] > presses + 1:
+                    visited[new_state] = presses + 1
+                    queue.append((new_state, presses + 1))
     return overall
 
-# too slow does not finish
-def part_2_req(wirings, joltage_reqs):
+
+def part_1_z3(lights_diagram: List[Tuple[bool, ...]], wirings: WiringSets) -> int:
     overall = 0
-    for wiring, joltage_req in zip(wirings, joltage_reqs):
-        best = sys.maxsize
-
-        @cache
-        def dfs(state, target, b_presses):
-            if is_same(state, target):
-                nonlocal best
-                best = min(best, b_presses)
-                return
-            for s, t in zip(state, target):
-                if s > t:
-                    return
-            if b_presses >= best:
-                return
-            for w in wiring:
-                new_state = update_state_partb(state, w)
-                dfs(new_state, target, b_presses + 1)
-            return
-        dfs(tuple(0 for _ in joltage_req), tuple(i for i in joltage_req), 0)
-        print(best)
-        overall += best
+    for lights, wiring in zip(lights_diagram, wirings):
+        cs = []
+        xs = []
+        for i, wire in enumerate(wiring):
+            c = [1 if i in wire else 0 for i in range(len(lights))]
+            cs.append(c)
+            xs.append(Int(f"x{i}"))
+        opt = Optimize()
+        for i in range(len(lights)):
+            opt.add(
+                (sum(xs[j] * cs[j][i] for j in range(len(xs))) % 2)
+                == (1 if lights[i] else 0)
+            )
+        opt.add([xs[i] >= 0 for i in range(len(xs))])
+        opt.minimize(sum(xs))
+        if opt.check() == sat:
+            m = opt.model()
+            total_presses = sum(int(str(m.evaluate(xs[i]))) for i in range(len(xs)))
+            overall += total_presses
+        else:
+            print("No solution")
     return overall
 
 
-def part_2(wirings, joltage_reqs):
-    return sum(calculate_minimum_presses(wiring, joltage_req) for wiring, joltage_req in zip(wirings, joltage_reqs))
+def part_2(wirings: WiringSets, joltage_reqs: List[List[int]]) -> int:
+    return sum(
+        calculate_minimum_presses(wiring, joltage_req)
+        for wiring, joltage_req in zip(wirings, joltage_reqs)
+    )
 
-def calculate_minimum_presses(wiring, joltage_req):
+
+def calculate_minimum_presses(wiring: WiringSet, joltage_req: List[int]) -> int:
     cs = []
     xs = []
     for i, wire in enumerate(wiring):
@@ -123,7 +99,7 @@ def calculate_minimum_presses(wiring, joltage_req):
     return 0
 
 
-def main():
+def main() -> None:
     lines = get_lines("input_10.txt")
     lights_diagram, wirings, joltage_reqs = parse_input(lines)
     print("Part 1:", part_1(lights_diagram, wirings))
