@@ -1,9 +1,8 @@
-from collections import defaultdict
 import sys
 from aoc import get_lines
 from functools import cache
-import sys
 
+# yolo
 sys.setrecursionlimit(100000)
 
 
@@ -80,7 +79,7 @@ def part_1(lights_diagram, wirings):
         overall += best
     return overall
 
-
+# too slow does not finish
 def part_2_req(wirings, joltage_reqs):
     overall = 0
     for wiring, joltage_req in zip(wirings, joltage_reqs):
@@ -121,15 +120,14 @@ def part_2(wirings, joltage_reqs):
             c = [1 if i in wire else 0 for i in range(len(joltage_req))]
             cs.append(c)
             xs.append(Int(f"x{i}"))
-        d = joltage_req
-        solver = Optimize()
-        for i in range(len(d)):
-            solver.add(sum(xs[j] * cs[j][i] for j in range(len(xs))) == d[i])
-        solver.add([xs[i] >= 0 for i in range(len(xs))])
-        solver.minimize(sum(xs))
-        if solver.check() == sat:
-            m = solver.model()
-            total_presses = sum(m.evaluate(xs[i]).as_long() for i in range(len(xs)))
+        opt = Optimize()
+        for i in range(len(joltage_req)):
+            opt.add(sum(xs[j] * cs[j][i] for j in range(len(xs))) == joltage_req[i])
+        opt.add([xs[i] >= 0 for i in range(len(xs))])
+        opt.minimize(sum(xs))
+        if opt.check() == sat:
+            m = opt.model()
+            total_presses = sum(int(str(m.evaluate(xs[i]))) for i in range(len(xs)))
             overall += total_presses
         else:
             print("No solution")
