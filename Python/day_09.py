@@ -1,3 +1,4 @@
+from bisect import bisect_right
 from aoc import get_lines, Point
 from itertools import combinations
 
@@ -13,11 +14,15 @@ def part_1(points):
 def part_2(points):
     lines = []
     inner_points = []
+    horizontal_lines = []
     for p1, p2 in zip(points, points[1:]):
         lines.append((p1, p2))
+        if p1.y == p2.y:
+            horizontal_lines.append((Point(min(p1.x, p2.x), p1.y), Point(max(p1.x, p2.x), p1.y)))
         if abs(p1.x - p2.x) > 5000:
             inner_points.append(max([p1, p2], key=lambda p: p.x))
     lines.append((points[-1], points[0]))
+    horizontal_lines = sorted(horizontal_lines, key=lambda line: line[0].x)
     max_area = 0
     # upper half
     p1 = max(inner_points, key=lambda p: p.y)
@@ -26,7 +31,7 @@ def part_2(points):
             continue
         to_check = Point(p1.x, p2.y)
         lines_to_check = []
-        for line in lines:
+        for line in horizontal_lines:
             if line[0] == p1 or line[1] == p1:
                 continue
             if (
@@ -42,7 +47,8 @@ def part_2(points):
         if p1 == p2 or p2.y > p1.y:
             continue
         to_check = Point(p1.x, p2.y)
-        for line in lines:
+        idx = bisect_right(horizontal_lines, p1.x, key=lambda line: line[0].x)
+        for line in horizontal_lines:
             if line[0] == p1 or line[1] == p1:
                 continue
             if (
