@@ -3,13 +3,10 @@ from aoc import get_lines
 from z3 import Int, Optimize, sat
 from collections import deque
 
-# Type aliases
-Wiring = List[int]
-WiringSet = List[Wiring]
-WiringSets = List[WiringSet]
 
-
-def parse_input(lines: List[str]) -> Tuple[List[Tuple[bool, ...]], WiringSets, List[List[int]]]:
+def parse_input(
+    lines: List[str],
+) -> Tuple[List[Tuple[bool, ...]], List[List[List[int]]], List[List[int]]]:
     lights_diagram = []
     wirings = []
     joltage_reqs = []
@@ -26,7 +23,9 @@ def parse_input(lines: List[str]) -> Tuple[List[Tuple[bool, ...]], WiringSets, L
     return lights_diagram, wirings, joltage_reqs
 
 
-def part_1(lights_diagram: List[Tuple[bool, ...]], wirings: WiringSets) -> int:
+def part_1(
+    lights_diagram: List[Tuple[bool, ...]], wirings: List[List[List[int]]]
+) -> int:
     overall = 0
     for lights, wiring in zip(lights_diagram, wirings):
         wiring_masks = [sum(1 << i for i in w) for w in wiring]
@@ -46,7 +45,9 @@ def part_1(lights_diagram: List[Tuple[bool, ...]], wirings: WiringSets) -> int:
     return overall
 
 
-def part_1_z3(lights_diagram: List[Tuple[bool, ...]], wirings: WiringSets) -> int:
+def part_1_z3(
+    lights_diagram: List[Tuple[bool, ...]], wirings: List[List[List[int]]]
+) -> int:
     overall = 0
     for lights, wiring in zip(lights_diagram, wirings):
         cs = []
@@ -65,21 +66,21 @@ def part_1_z3(lights_diagram: List[Tuple[bool, ...]], wirings: WiringSets) -> in
         opt.minimize(sum(xs))
         if opt.check() == sat:
             m = opt.model()
-            total_presses = sum(int(str(m.evaluate(xs[i]))) for i in range(len(xs)))
+            total_presses = sum(m.evaluate(x).as_long() for x in xs) # type: ignore
             overall += total_presses
         else:
             print("No solution")
     return overall
 
 
-def part_2(wirings: WiringSets, joltage_reqs: List[List[int]]) -> int:
+def part_2(wirings: List[List[List[int]]], joltage_reqs: List[List[int]]) -> int:
     return sum(
         calculate_minimum_presses(wiring, joltage_req)
         for wiring, joltage_req in zip(wirings, joltage_reqs)
     )
 
 
-def calculate_minimum_presses(wiring: WiringSet, joltage_req: List[int]) -> int:
+def calculate_minimum_presses(wiring: List[List[int]], joltage_req: List[int]) -> int:
     cs = []
     xs = []
     for i, wire in enumerate(wiring):
@@ -93,7 +94,7 @@ def calculate_minimum_presses(wiring: WiringSet, joltage_req: List[int]) -> int:
     opt.minimize(sum(xs))
     if opt.check() == sat:
         m = opt.model()
-        total_presses = sum(int(str(m.evaluate(xs[i]))) for i in range(len(xs)))
+        total_presses = sum(m.evaluate(x).as_long() for x in xs) # type: ignore
         return total_presses
     print("No solution")
     return 0
