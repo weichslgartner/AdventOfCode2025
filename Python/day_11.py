@@ -9,7 +9,7 @@ def parse_input(lines: List[str]) -> DefaultDict[str, List[str]]:
     graph = defaultdict(list)
     for line in lines:
         parent, children = line.split(": ", maxsplit=1)
-        for child in children.split(" "):
+        for child in children.split():
             graph[parent].append(child)
     return graph
 
@@ -19,10 +19,7 @@ def part_1(graph: DefaultDict[str, List[str]]) -> int:
     def dfs(node):
         if node == "out":
             return 1
-        res = 0
-        for child in graph[node]:
-            res += dfs(child)
-        return res
+        return sum(dfs(child) for child in graph[node])
     return dfs("you")
 
 
@@ -35,10 +32,7 @@ def part_2(graph: DefaultDict[str, List[str]]) -> int:
             fft = True
         if node == "dac":
             dac = True
-        res = 0
-        for child in graph[node]:
-            res += dfs(child, fft, dac)
-        return res
+        return sum(dfs(child, fft, dac) for child in graph[node])
     return dfs("svr", False, False)
 
 
