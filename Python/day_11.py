@@ -20,6 +20,7 @@ def part_1(graph: DefaultDict[str, List[str]]) -> int:
         if node == "out":
             return 1
         return sum(dfs(child) for child in graph[node])
+
     return dfs("you")
 
 
@@ -33,6 +34,7 @@ def part_2(graph: DefaultDict[str, List[str]]) -> int:
         if node == "dac":
             dac = True
         return sum(dfs(child, fft, dac) for child in graph[node])
+
     return dfs("svr", False, False)
 
 
