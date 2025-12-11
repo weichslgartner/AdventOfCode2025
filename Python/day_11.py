@@ -1,32 +1,34 @@
 from collections import defaultdict
+from functools import cache
+from typing import List, DefaultDict
+
 from aoc import get_lines
 
 
-def parse_input(lines):
+def parse_input(lines: List[str]) -> DefaultDict[str, List[str]]:
     graph = defaultdict(list)
     for line in lines:
-        parent, children = line.split(": ",maxsplit=1)
+        parent, children = line.split(": ", maxsplit=1)
         for child in children.split(" "):
             graph[parent].append(child)
     return graph
 
-def dfs(node, graph):
-    if node == "out":
-        return 1
-    res = 0
-    for child in graph[node]:
-        res += dfs(child, graph)
-    return res
 
-def part_1(graph):
-    return dfs("you", graph)
-
-
-
-def part_2(graph):
-    from functools import cache
+def part_1(graph: DefaultDict[str, List[str]]) -> int:
     @cache
-    def dfs_part2(node, fft, dac ):
+    def dfs(node):
+        if node == "out":
+            return 1
+        res = 0
+        for child in graph[node]:
+            res += dfs(child)
+        return res
+    return dfs("you")
+
+
+def part_2(graph: DefaultDict[str, List[str]]) -> int:
+    @cache
+    def dfs(node, fft, dac):
         if node == "out" and fft and dac:
             return 1
         if node == "fft":
@@ -35,18 +37,17 @@ def part_2(graph):
             dac = True
         res = 0
         for child in graph[node]:
-            res += dfs_part2(child, fft, dac)
+            res += dfs(child, fft, dac)
         return res
+    return dfs("svr", False, False)
 
-    return dfs_part2("svr", False, False)
 
-
-def main():
+def main() -> None:
     lines = get_lines("input_11.txt")
     graph = parse_input(lines)
     print("Part 1:", part_1(graph))
     print("Part 2:", part_2(graph))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
