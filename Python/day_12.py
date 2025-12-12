@@ -5,14 +5,16 @@ from aoc import Point, input_as_str, parse_grid
 
 Region = Tuple[List[int], List[int]]
 
+
+
+
 def parse_input(input_str: str) -> Tuple[Dict[int, Set[Point]], List[Region]]:
     shapes = {}
     regions = []
     for block in input_str.split("\n\n"):
         lines = block.splitlines()
         if "x" in lines[0]:
-            for line in lines:
-                size, gifts = line.split(":")
+            for size, gifts  in map(lambda line: line.split(":"),lines):
                 regions.append(
                     (
                         list(map(int, size.split("x", maxsplit=1))),
